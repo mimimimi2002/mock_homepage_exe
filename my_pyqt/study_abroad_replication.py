@@ -7,20 +7,21 @@ import subprocess
 import socket
 import webbrowser
 import traceback
+import time
+
 
 class UploadApp(QWidget):
     def __init__(self):
         super().__init__()
         self.server_process = None
+
         self.setWindowTitle('モックホームページを立ち上げ')
         self.layout = QVBoxLayout()
 
-        # ボタン
         self.btn_upload = QPushButton('フォルダを選択', self)
         self.btn_upload.clicked.connect(self.open_file_dialog)
         self.layout.addWidget(self.btn_upload)
 
-        # ラベル
         self.label_file = QLabel('dataフォルダが選択されていません', self)
         self.label_file.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label_file.setTextInteractionFlags(
@@ -32,21 +33,19 @@ class UploadApp(QWidget):
         self.resize(500, 300)
         self.setStyleSheet("background-color: #FFF3E0;")
 
-    # ========= パス関連 =========
+    # ========= パス =========
 
     def get_external_base_path(self):
-        """書き込み先（exe外）"""
         if getattr(sys, 'frozen', False):
             return os.path.dirname(sys.executable)
         return os.path.dirname(os.path.abspath(__file__))
 
     def get_internal_base_path(self):
-        """読み込み元（exe内 or 通常）"""
         if hasattr(sys, '_MEIPASS'):
             return sys._MEIPASS
         return os.path.dirname(os.path.abspath(__file__))
 
-    # ========= メイン処理 =========
+    # ========= メイン =========
 
     def open_file_dialog(self):
         data_folder_path = QFileDialog.getExistingDirectory(self, "dataフォルダを選択")
@@ -55,69 +54,75 @@ class UploadApp(QWidget):
 
         self.label_file.setText(f'選択: {data_folder_path}')
 
-        # 必須ファイルチェック
-        files = [
-            os.path.join(data_folder_path, "judge_data", "updated_judge.xlsx"),
-            os.path.join(data_folder_path, "judge_data", "judge_data.json"),
-            os.path.join(data_folder_path, "judge_data", "option_count.json"),
-            os.path.join(data_folder_path, "judge_data", "option_data.json"),
-            os.path.join(data_folder_path, "image"),
-        ]
-
-        missing_files = [f for f in files if not os.path.exists(f)]
-
-        if missing_files:
-            self.show_error(["以下のファイルが見つかりません:\n" + "\n".join(missing_files)])
-            return
-
         try:
-            # ========= パス準備 =========
+            # ========= ファイルチェック =========
+            files = [
+                os.path.join(data_folder_path, "judge_data", "updated_judge.xlsx"),
+                os.path.join(data_folder_path, "judge_data", "judge_data.json"),
+                os.path.join(data_folder_path, "judge_data", "option_count.json"),
+                os.path.join(data_folder_path, "judge_data", "option_data.json"),
+                os.path.join(data_folder_path, "image"),
+            ]
+
+            missing = [f for f in files if not os.path.exists(f)]
+            if missing:
+                self.show_error(["以下が見つかりません:\n" + "\n".join(missing)])
+                return
+
+            # ========= パス =========
             external_base = self.get_external_base_path()
             internal_base = self.get_internal_base_path()
 
             external_mock = os.path.join(external_base, "homepage_mock")
             internal_mock = os.path.join(internal_base, "homepage_mock")
 
-            # ========= 初回：テンプレートコピー =========
+            # ========= 初回コピー =========
             if not os.path.exists(external_mock):
                 shutil.copytree(internal_mock, external_mock)
 
-            # ========= data上書き =========
+            # ========= data更新 =========
             dest_data = os.path.join(external_mock, "data")
 
             if os.path.exists(dest_data):
-                shutil.rmtree(dest_data)
+                shutil.rmtree(dest_data, ignore_errors=True)
 
             shutil.copytree(data_folder_path, dest_data)
 
-            # ========= サーバー起動 =========
-            if self.server_process:
-                self.server_process.terminate()
-                self.server_process.wait()
+            # ========= サーバー再起動 =========
+            self.stop_server()
 
             port = self.find_free_port()
 
             self.server_process = subprocess.Popen(
                 [sys.executable, "-m", "http.server", str(port)],
-                cwd=external_mock
+                cwd=external_mock,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
             )
 
+            # ========= 起動確認 =========
+            if not self.wait_for_server(port):
+                self.server_process = None
+                raise RuntimeError("サーバー起動に失敗しました")
+
             url = f"http://localhost:{port}/homepage.html"
-            if self.wait_for_server(port):
-                webbrowser.open(url)
-                self.label_file.setText(
-                    f"サーバーを起動しました。\n{url}"
-                )
-            else:
-                QMessageBox.critical(self, "エラー", traceback.format_exc())
+            webbrowser.open(url)
 
-                self.label_file.setText(
-                    f"サーバーの起動に失敗しました。\n{url}"
-                )
+            self.label_file.setText(f"サーバー起動中\n{url}")
 
-        except Exception as e:
+        except Exception:
             QMessageBox.critical(self, "エラー", traceback.format_exc())
 
+    # ========= サーバー制御 =========
+
+    def stop_server(self):
+        if self.server_process:
+            try:
+                self.server_process.terminate()
+                self.server_process.wait(timeout=2)
+            except:
+                pass
+            self.server_process = None
 
     # ========= ユーティリティ =========
 
@@ -134,20 +139,18 @@ class UploadApp(QWidget):
             port += 1
         return port
 
+    def wait_for_server(self, port, timeout=5):
+        start = time.time()
+        while time.time() - start < timeout:
+            if self.is_port_in_use(port):
+                return True
+            time.sleep(0.1)
+        return False
+
     def closeEvent(self, event):
-        if self.server_process:
-            self.server_process.terminate()
-            self.server_process.wait()
+        self.stop_server()
         event.accept()
 
-    def wait_for_server(self, port, timeout=5):
-      import time
-      start = time.time()
-      while time.time() - start < timeout:
-          if self.is_port_in_use(port):
-              return True
-          time.sleep(0.1)
-      return False
 
 # ========= 起動 =========
 
