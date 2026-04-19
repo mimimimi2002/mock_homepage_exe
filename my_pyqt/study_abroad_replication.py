@@ -99,11 +99,21 @@ class UploadApp(QWidget):
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
+            
+            print("cwd:", external_mock)
+            print("exists:", os.path.exists(external_mock))
+            print("port:", port)
+            print("server_process:", self.server_process)
 
             # ========= 起動確認 =========
             if not self.wait_for_server(port):
                 self.server_process = None
-                raise RuntimeError("サーバー起動に失敗しました")
+                raise RuntimeError(
+                    f"サーバー起動失敗\n"
+                    f"cwd={external_mock}\n"
+                    f"exists={os.path.exists(external_mock)}\n"
+                    f"port={port}"
+                )
 
             url = f"http://localhost:{port}/homepage.html"
             webbrowser.open(url)
