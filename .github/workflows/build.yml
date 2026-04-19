@@ -21,7 +21,7 @@ jobs:
 
       - name: EXE作成
         run: |
-          pyinstaller my_pyqt/study_abroad_replication.py --add-data "my_pyqt/homepage_mock;homepage_mock"
+          pyinstaller my_pyqt/study_abroad_replication.py --add-data "my_pyqt/homepage_mock;homepage_mock" --onefile --windowed
 
       - name: 成果物アップロード
         uses: actions/upload-artifact@v4

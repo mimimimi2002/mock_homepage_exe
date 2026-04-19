@@ -98,7 +98,7 @@ class UploadApp(QWidget):
             port = self.find_free_port()
 
             self.server_process = subprocess.Popen(
-                ["python", "-m", "http.server", str(port)],
+                [sys.executable, "-m", "http.server", str(port)],
                 cwd=external_mock
             )
 
