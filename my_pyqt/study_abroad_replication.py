@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import socket
 import webbrowser
-
+import traceback
 
 class UploadApp(QWidget):
     def __init__(self):
@@ -116,7 +116,8 @@ class UploadApp(QWidget):
                 )
 
         except Exception as e:
-            QMessageBox.critical(self, "エラー", e)
+            QMessageBox.critical(self, "エラー", traceback.format_exc())
+
 
     # ========= ユーティリティ =========
 
