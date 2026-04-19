@@ -1,5 +1,8 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QLabel, QMessageBox
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QPushButton, QVBoxLayout,
+    QFileDialog, QLabel, QMessageBox
+)
 from PyQt6.QtCore import Qt
 import os
 import shutil
@@ -96,25 +99,25 @@ class UploadApp(QWidget):
             self.server_process = subprocess.Popen(
                 [sys.executable, "-m", "http.server", str(port)],
                 cwd=external_mock,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
             )
-            
-            print("cwd:", external_mock)
-            print("exists:", os.path.exists(external_mock))
-            print("port:", port)
-            print("server_process:", self.server_process)
+
+            # ========= 即クラッシュ検出 =========
+            time.sleep(0.5)
+
+            if self.server_process.poll() is not None:
+                out, err = self.server_process.communicate()
+                raise RuntimeError(
+                    "HTTPサーバーが起動直後にクラッシュしました\n\n"
+                    f"STDOUT:\n{out}\n\n"
+                    f"STDERR:\n{err}"
+                )
 
             # ========= 起動確認 =========
             if not self.wait_for_server(port):
-                self.server_process = None
-                raise RuntimeError(
-                    f"サーバー起動失敗\n"
-                    f"cwd={external_mock}\n"
-                    f"exists={os.path.exists(external_mock)}\n"
-                    f"files={os.listdir(external_mock)}\n"
-                    f"port={port}"
-                )
+                raise RuntimeError("サーバー起動待機に失敗しました（ポート未開放）")
 
             url = f"http://localhost:{port}/homepage.html"
             webbrowser.open(url)
