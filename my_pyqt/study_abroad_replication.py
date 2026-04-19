@@ -112,6 +112,7 @@ class UploadApp(QWidget):
                     f"サーバー起動失敗\n"
                     f"cwd={external_mock}\n"
                     f"exists={os.path.exists(external_mock)}\n"
+                    f"files={os.listdir(external_mock)}\n"
                     f"port={port}"
                 )
 
