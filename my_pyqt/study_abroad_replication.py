@@ -98,19 +98,22 @@ class UploadApp(QWidget):
             port = self.find_free_port()
 
             self.server_process = subprocess.Popen(
-                ["python", "-m", "http.server", str(port)],
+                [sys.executable, "-m", "http.server", str(port)],
                 cwd=external_mock
             )
 
             url = f"http://localhost:{port}/homepage.html"
             if self.wait_for_server(port):
                 webbrowser.open(url)
+                self.label_file.setText(
+                    f"サーバーを起動しました。\n{url}"
+                )
             else:
-                QMessageBox.critical(self, "エラー", "サーバーの起動に失敗しました")
+                QMessageBox.critical(self, "エラー", "サーバーの起動に失敗しました", e)
 
-            self.label_file.setText(
-                f"サーバーを起動しました。\n{url}"
-            )
+                self.label_file.setText(
+                    f"サーバーの起動に失敗しました。\n{url}"
+                )
 
         except Exception as e:
             QMessageBox.critical(self, "エラー", str(e))
