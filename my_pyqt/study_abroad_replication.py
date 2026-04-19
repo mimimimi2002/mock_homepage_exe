@@ -109,7 +109,7 @@ class UploadApp(QWidget):
                     f"サーバーを起動しました。\n{url}"
                 )
             else:
-                QMessageBox.critical(self, "エラー", "サーバーの起動に失敗しました", e)
+                QMessageBox.critical(self, "エラー", traceback.format_exc())
 
                 self.label_file.setText(
                     f"サーバーの起動に失敗しました。\n{url}"
