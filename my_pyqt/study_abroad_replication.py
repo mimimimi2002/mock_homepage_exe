@@ -116,7 +116,7 @@ class UploadApp(QWidget):
                 )
 
         except Exception as e:
-            QMessageBox.critical(self, "エラー", str(e))
+            QMessageBox.critical(self, "エラー", e)
 
     # ========= ユーティリティ =========
 
