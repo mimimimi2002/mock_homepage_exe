@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang = "ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Document</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+    </head>
+    <script src="js/button.js"></script>
+    <script src="js/menu.js"></script>
+    <script defer>
+      document.addEventListener("DOMContentLoaded", async () => {
+        await menuInit();
+        await buttonInit();
+        get_option_buttons("style");
+        let menu = get_menu();
+        let menuElement = document.getElementById("menu");
+
+        for (let i = 0; i < menu.length; i++) {
+          menuElement.textContent += " > " + menu[i]
+        }
+      });
+    </script>
+    <body>
+        <div style="padding-left: 10px;">
+          <a href="homepage.html">ホーム</a>
+          <span id="menu"></span>
+        </div>
+        <h1 style="text-align: center">
+            <div>留学スタイル</div>
+        </h1>
+        <!--
+        <button>
+          <div id = "back-button"></div>
+        <button>
+          <a href="homepage.html">最初のページに戻る</a>
+        </button>
+        -->
+        <div id = "create-button"></div>
+    </body>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</html>

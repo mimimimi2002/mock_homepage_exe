@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang = "ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Document</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+    </head>
+
+    <style>
+        img.example1 {
+          width: 300px;
+          height: 300px;
+          }
+        .themed-grid-col {
+            padding-top: .75rem;
+            padding-bottom: .75rem;
+            background-color: rgba(112.520718, 44.062154, 249.437846, .15);
+            border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
+          }
+          .themed-container {
+            padding: .75rem;
+            margin-bottom: 1.5rem;
+            background-color: rgba(112.520718, 44.062154, 249.437846, .15);
+            border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
+          }
+        p{
+            position: relative;
+            top:10%;
+            left:50%;
+            transform: translate(-50%,-50%);
+            padding:0;
+            margin:0;
+            font-size:30px;
+            color: black;
+        }
+          .custom-img {
+            max-width: 100%;
+            max-height: 190px;
+          }
+
+    </style>
+
+    <body>
+        <div class="container">
+        <div class="mx-auto">
+            <div class="row justify-content-center">
+                <div style="text-align: center", class = "justify-content-center">
+                    <img src="./data/image/image.png" class = "img-fluid custom-img" alt="image"> 
+                    <p>あなたの希望を叶える<br>留学プログラムを探そう!</p>
+                </div>
+              </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-3 mb-3 text-center justify-content-center pl-md-4">
+                <div class="col-4">
+                    <div class="card mb-4 rounded-3 shadow-sm h-100"style="max-height: auto;">
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <a href="period.html"  class="w-100 text-center d-flex flex-column justify-content-center btn btn-lg btn-primary h-100" type="button" style="font-size:small;">期間で選ぶ</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                  <div class="card mb-4 rounded-3 shadow-sm h-100"style="height: auto;">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <a href="language.html"  class="w-100 text-center d-flex flex-column justify-content-center btn btn-lg btn-primary h-100" type="button"  style="background-color: #e16112; border-color: #e16112; color: #ffffff; font-size: small;">語学レベルで選ぶ</a>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="col-4">
+                  <div class="card mb-4 rounded-3 shadow-sm h-100"style="height: auto;">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <a href="season.html"  class="w-100 text-center d-flex flex-column justify-content-center btn btn-lg btn-primary h-100" type="button"  style="background-color: #2e9f259d; border-color: #2e9f259d; color: #ffffff; font-size: small;">次の長期休みにすぐ行きたい</a>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="col-4">
+                    <div class="card mb-4 rounded-3 shadow-sm h-100"style="height: auto;">
+                      <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <a href="purpose.html"  class="w-100 text-center d-flex flex-column justify-content-center btn btn-lg btn-primary h-100" type="button" style="background-color: #f2d65cde; border-color: #f2d65cde; color: #ffffff; font-size: small;">留学目的で選ぶ</a>
+                    </div>
+                    </div>
+                  </div>
+
+                <div class="col-4">
+                  <div class="card mb-4 rounded-3 shadow-sm h-100" style="height: auto;">
+
+                      <div class="card-body text-center d-flex flex-column justify-content-center">
+                          <a href="style.html" class="w-100 text-center d-flex flex-column justify-content-center btn btn-lg btn-primary h-100" type="button" style="background-color: #1b1b1aa0; border-color: #1b1b1aa0; color: #ffffff; font-size: small;">留学スタイルで選ぶ</a>
+                      </div>
+
+                   </div>
+                  </div>
+                <div class="col-4">
+                  <div class="card mb-4 rounded-3 shadow-sm h-100" style="height: auto;">
+                      <div class="card-body text-center d-flex flex-column justify-content-center">
+                          <a href="event.html" class="w-100 text-center d-flex flex-column justify-content-center btn btn-lg btn-primary h-100" type="button" style="background-color: #d31ceba0; border-color: #d31ceba0; color: #ffffff; font-size: small;">学内でできること</a>
+                      </div>
+                  </div>
+                </div>
+
+                <!-- 以下に選択肢を追加　-->
+              </div>
+        </div>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+          const urlParams = new URLSearchParams(window.location.search);
+          const myParam = urlParams.get('param');
+          const links = document.querySelectorAll('.w-100.btn.btn-lg.btn-primary');
+          links.forEach((link,index) => {
+              const href = link.getAttribute('href');
+              link.setAttribute('href', href + "?param="+"H" + (index+1));
+          });
+      </script>
+    </body>
+</html>
