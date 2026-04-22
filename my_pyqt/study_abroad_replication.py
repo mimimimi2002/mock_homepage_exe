@@ -117,13 +117,13 @@ class UploadApp(QWidget):
 
     # ========= サーバー（thread化） =========
 
-    def start_server(self, port, external_mock):
+    def start_server(self, port, root_dir):
         if self.server_thread and self.server_thread.is_alive():
             return
 
         self.server_thread = threading.Thread(
             target=server.run,
-            args=(port,external_mock),
+            args=(port, root_dir),
             daemon=True
         )
         self.server_thread.start()
