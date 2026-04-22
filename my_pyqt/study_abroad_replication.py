@@ -79,38 +79,52 @@ class UploadApp(QWidget):
 
             external_mock = os.path.join(external_base, "homepage_mock")
             internal_mock = os.path.join(internal_base, "homepage_mock")
+            if f.lower().endswith(".exe"):
+                try:
+                    shutil.copy2(src, dst)
+                except PermissionError:
+                    time.sleep(0.3)
+                    shutil.copy2(src, dst)
 
-            # ========= 初回コピー =========
-            if not os.path.exists(external_mock):
-                shutil.copytree(internal_mock, external_mock)
+            import shutil
+            import os
 
-            print("external_mock", external_mock)
-            print("files:", os.listdir(external_mock))
+            if os.path.exists(external_mock):
+                shutil.rmtree(external_mock, ignore_errors=True)
 
-            # ========= data更新 =========
-            dest_data = os.path.join(external_mock, "data")
+            os.makedirs(external_mock, exist_ok=True)
 
-            if os.path.exists(dest_data):
-                shutil.rmtree(dest_data, ignore_errors=True)
+            for root, dirs, files in os.walk(internal_mock):
+                rel = os.path.relpath(root, internal_mock)
+                target_dir = os.path.join(external_mock, rel)
+                os.makedirs(target_dir, exist_ok=True)
 
-            shutil.copytree(data_folder_path, dest_data)
+                for file in files:
+                    src = os.path.join(root, file)
+                    dst = os.path.join(target_dir, file)
 
-            # ========= サーバー再起動 =========
-            self.stop_server()
+                    try:
+                        shutil.copy2(src, dst)
+                    except PermissionError:
+                        time.sleep(0.3)
+                        shutil.copy2(src, dst)
 
-            port = self.find_free_port()
-            server_path = os.path.join(external_mock, "server.exe") if platform.system() == "Windows" else os.path.join(external_mock, "server")
-            print("server_path", server_path)
-            print("exists:", os.path.exists(server_path))
+                        # ========= サーバー再起動 =========
+                        self.stop_server()
+
+                        port = self.find_free_port()
+                        server_path = os.path.join(external_mock, "server.exe") if platform.system() == "Windows" else os.path.join(external_mock, "server")
+                        print("server_path", server_path)
+                        print("exists:", os.path.exists(server_path))
 
 
-            self.server_process = subprocess.Popen(
-                [server_path, str(port)],
-                cwd=external_mock,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+                        self.server_process = subprocess.Popen(
+                            [server_path, str(port)],
+                            cwd=external_mock,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            text=True
+                        )
 
             # ========= 即クラッシュ検出 =========
             time.sleep(0.5)
