@@ -1,12 +1,10 @@
-# server.py
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler
+from socketserver import TCPServer
+from functools import partial
 
-def run(port=8000):
-    server = HTTPServer(("127.0.0.1", port), SimpleHTTPRequestHandler)
-    print(f"Serving on {port}")
-    server.serve_forever()
+def run(port, directory):
+    handler = partial(SimpleHTTPRequestHandler, directory=directory)
 
-if __name__ == "__main__":
-    import sys
-    port = int(sys.argv[1])
-    run(port)
+    with TCPServer(("localhost", port), handler) as httpd:
+        print(f"Serving {directory} at port {port}")
+        httpd.serve_forever()

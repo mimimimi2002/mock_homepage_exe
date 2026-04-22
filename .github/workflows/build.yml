@@ -21,14 +21,9 @@ jobs:
 
       - name: EXE作成
         run: |
-          pyinstaller my_pyqt/server.py --onefile --windowed
-          Copy-Item dist/server.exe my_pyqt/homepage_mock/
-
-          dir my_pyqt\homepage_mock
-
-          pyinstaller my_pyqt/study_abroad_replication.py `
-            --add-data "my_pyqt/homepage_mock;homepage_mock" `
-            --onefile --windowed --clean
+          pyinstaller my_pyqt/study_abroad_replication.py \
+            --add-data "my_pyqt/homepage_mock:homepage_mock" \
+            --onefile --windowed
 
       - name: 成果物アップロード
         uses: actions/upload-artifact@v4
