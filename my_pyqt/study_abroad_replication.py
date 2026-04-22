@@ -11,6 +11,7 @@ import socket
 import webbrowser
 import traceback
 import time
+import platform
 
 
 class UploadApp(QWidget):
@@ -82,6 +83,9 @@ class UploadApp(QWidget):
             # ========= 初回コピー =========
             if not os.path.exists(external_mock):
                 shutil.copytree(internal_mock, external_mock)
+            
+            print("external_mock", external_mock)
+            print("files:", os.listdir(external_mock))
 
             # ========= data更新 =========
             dest_data = os.path.join(external_mock, "data")
@@ -95,9 +99,13 @@ class UploadApp(QWidget):
             self.stop_server()
 
             port = self.find_free_port()
+            server_path = os.path.join(external_mock, "server.exe") if platform.system() == "Windows" else os.path.join(external_mock, "server")
+            print("server_path", server_path)
+            print("exists:", os.path.exists(server_path))
+
 
             self.server_process = subprocess.Popen(
-                [sys.executable, "-m", "http.server", str(port)],
+                [server_path, str(port)],
                 cwd=external_mock,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -117,8 +125,13 @@ class UploadApp(QWidget):
 
             # ========= 起動確認 =========
             if not self.wait_for_server(port):
-                raise RuntimeError("サーバー起動待機に失敗しました（ポート未開放）")
-
+                out, err = self.server_process.communicate()
+                raise RuntimeError(
+                    f"サーバー起動待機に失敗しました（ポート未開放）\n\n"
+                    f"PORT: {port}\n\n"
+                    f"STDOUT:\n{out}\n\n"
+                    f"STDERR:\n{err}"
+                )
             url = f"http://localhost:{port}/homepage.html"
             webbrowser.open(url)
 
