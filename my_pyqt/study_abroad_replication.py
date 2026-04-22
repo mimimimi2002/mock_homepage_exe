@@ -81,11 +81,10 @@ class UploadApp(QWidget):
             internal_mock = os.path.join(internal_base, "homepage_mock")
 
             # ========= 初回コピー =========
-            if not os.path.exists(external_mock):
-                shutil.copytree(internal_mock, external_mock)
-            
-            print("external_mock", external_mock)
-            print("files:", os.listdir(external_mock))
+            if os.path.exists(external_mock):
+                shutil.rmtree(external_mock)
+
+            shutil.copytree(internal_mock, external_mock)
 
             # ========= data更新 =========
             dest_data = os.path.join(external_mock, "data")
