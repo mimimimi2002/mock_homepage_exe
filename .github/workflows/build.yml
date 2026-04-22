@@ -21,7 +21,7 @@ jobs:
 
       - name: EXE作成
         run: |
-          pyinstaller my_pyqt/server.py --onefile
+          pyinstaller my_pyqt/server.py --onefile --windowed
           Copy-Item dist/server.exe my_pyqt/homepage_mock/
 
           dir my_pyqt\homepage_mock
