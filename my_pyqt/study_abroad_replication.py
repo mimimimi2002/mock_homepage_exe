@@ -124,7 +124,7 @@ class UploadApp(QWidget):
         self.server_thread = threading.Thread(
             target=server.run,
             args=(port, root_dir),
-            daemon=False
+            daemon=True
         )
         self.server_thread.start()
 
