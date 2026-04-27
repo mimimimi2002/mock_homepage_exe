@@ -107,7 +107,7 @@ class UploadApp(QWidget):
             if not self.wait_for_server(port):
                 raise RuntimeError("サーバー起動に失敗しました")
 
-            url = f"http://localhost:{port}/homepage.html"
+            url = f"http://127.0.0.1:{port}/homepage.html"
             webbrowser.open(url)
 
             self.label_file.setText(f"サーバー起動中\n{url}")
