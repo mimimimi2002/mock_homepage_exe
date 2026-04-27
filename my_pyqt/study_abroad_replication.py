@@ -110,7 +110,26 @@ class UploadApp(QWidget):
             url = f"http://127.0.0.1:{port}/homepage.html"
             webbrowser.open(url)
 
-            self.label_file.setText(f"サーバー起動中\n{url}")
+            # self.label_file.setText(f"サーバー起動中\n{url}")
+            info = f"""
+            サーバー起動中
+
+            === PATH INFO ===
+            external_base: {external_base}
+            internal_base: {internal_base}
+
+            external_mock: {external_mock}
+            internal_mock: {internal_mock}
+
+            data_folder: {data_folder_path}
+            dest_data: {dest_data}
+
+            homepage exists: {os.path.exists(os.path.join(external_mock, "homepage.html"))}
+
+            server url: http://127.0.0.1:{port}/homepage.html
+            """
+
+            self.label_file.setText(info)
 
         except Exception:
             QMessageBox.critical(self, "エラー", traceback.format_exc())
