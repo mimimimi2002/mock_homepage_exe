@@ -2,9 +2,20 @@ from http.server import SimpleHTTPRequestHandler
 from socketserver import ThreadingTCPServer
 from functools import partial
 
+from http.server import SimpleHTTPRequestHandler
+
+class DebugHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        print("REQUEST:", self.path)
+        try:
+            return super().do_GET()
+        except Exception as e:
+            print("HANDLER ERROR:", e)
+            raise
+
 def run(port, directory):
     try:
-        handler = partial(SimpleHTTPRequestHandler, directory=directory)
+        handler = partial(DebugHandler, directory=directory)
 
         with ThreadingTCPServer(("127.0.0.1", port), handler) as httpd:
             print(f"Serving {directory} at port {port}")
